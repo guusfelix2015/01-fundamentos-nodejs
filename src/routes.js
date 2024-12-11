@@ -7,7 +7,7 @@ const database = new Database();
 export const routes = [
   {
     method: "GET",
-    patch: buildRoutePath("/users"),
+    path: buildRoutePath("/users"),
     handler: (req, res) => {
       const users = database.select("users");
 
@@ -16,7 +16,7 @@ export const routes = [
   },
   {
     method: "POST",
-    patch: buildRoutePath("/users"),
+    path: buildRoutePath("/users"),
     handler: (req, res) => {
       const { name, email } = req.body;
       const user = {
@@ -32,18 +32,9 @@ export const routes = [
   },
   {
     method: "DELETE",
-    patch: buildRoutePath("/users/:id"),
+    path: buildRoutePath("/users/:id"),
     handler: (req, res) => {
-      const { name, email } = req.body;
-      const user = {
-        name,
-        email,
-        id: randomUUID(),
-      };
-
-      database.insert("users", user);
-
-      return res.writeHead(201).end();
+      return res.end();
     },
   },
 ];
