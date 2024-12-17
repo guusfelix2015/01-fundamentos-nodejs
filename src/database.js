@@ -6,7 +6,7 @@ export class Database {
   #database = {};
 
   constructor() {
-    fs.readFile(databasePatch, "utf-8")
+    fs.readFile(databasePatch, "utf8")
       .then((data) => {
         this.#database = JSON.parse(data);
       })
@@ -19,14 +19,22 @@ export class Database {
     fs.writeFile(databasePatch, JSON.stringify(this.#database));
   }
 
-  select(table) {
-    const data = this.#database[table] ?? [];
+  select(table, search) {
+    let data = this.#database[table] ?? [];
+
+    if (search) {
+      data = data.filter((row) => {
+        return Object.entries(search).some(([key, value]) => {
+          return row[key].includes(value);
+        });
+      });
+    }
 
     return data;
   }
 
   insert(table, data) {
-    if (Array.isArray(this.#database)) {
+    if (Array.isArray(this.#database[table])) {
       this.#database[table].push(data);
     } else {
       this.#database[table] = [data];
@@ -35,6 +43,15 @@ export class Database {
     this.#persist();
 
     return data;
+  }
+
+  update(table, id, data) {
+    const rowIndex = this.#database[table].findIndex((row) => row.id === id);
+
+    if (rowIndex > -1) {
+      this.#database[table][rowIndex] = { id, ...data };
+      this.#persist();
+    }
   }
 
   delete(table, id) {
